@@ -6,6 +6,12 @@
         expr
     }
 
-    
+    pub fn print_controls () {
+        println!();
+        println!("------------------------------------------------------------------");
+        println!("Ctrl-C to force shutdown or type \"end\" terminates the calculator");
+        println!("------------------------------------------------------------------");
+        println!();
+    }
 
 

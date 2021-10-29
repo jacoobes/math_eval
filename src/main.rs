@@ -1,13 +1,11 @@
 pub mod cli;
-
-use cli::cli_tools::ask_for_expr;
+pub mod tokenizer;
+use cli::cli_tools::*;
 fn main() {
-    println!();
-    println!("Ctrl-C to force shutdown or \"end\" to stop evaluating");
+    print_controls();
     loop {
 
         println!("Enter a math expression: ");
-        
         let expr = ask_for_expr().trim();
         println!();
         
