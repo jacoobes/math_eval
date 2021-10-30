@@ -1,3 +1,5 @@
+use maplit::hashmap;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Token {
@@ -12,6 +14,14 @@ impl Token {
             token_type,
             value,
             location,
+        }
+    }
+
+    pub fn literal () -> HashMap<String, String> {
+        hashmap! {
+            
+
+
         }
     }
 }
@@ -29,6 +39,7 @@ pub enum TokenType {
     Minus,
     Plus,
     Divide,
+    Multiply,
     Modulus,
     ArcSine,
     ArcCosine,

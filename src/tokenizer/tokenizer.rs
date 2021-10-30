@@ -1,11 +1,12 @@
 use super::tokens::TokenType::*;
 use super::tokens::*;
 
+
 pub fn tokenizer(expr: String) -> Vec<Token> {
     let chars: Vec<char> = expr.chars().collect();
     let mut tokens: Vec<Token> = vec![];
 
-    for i in 0..chars.len() {
+    for mut i in 0..chars.len() {
         let ch = chars[i];
         match ch {
             '{' => tokens.push(Token::new(LeftCurly, Some(String::from(ch)), i)),
@@ -21,12 +22,14 @@ pub fn tokenizer(expr: String) -> Vec<Token> {
             '-' => tokens.push(Token::new(Minus, Some(String::from(ch)), i)),
 
             '/' => tokens.push(Token::new(Divide, Some(String::from(ch)), i)),
+            'x' => tokens.push(Token::new(Multiply, Some(String::from(ch)), i)),
             '%' => tokens.push(Token::new(Modulus, Some(String::from(ch)), i)),
 
             '.' => tokens.push(Token::new(Dot, Some(String::from(ch)), i)),
             '_' => tokens.push(Token::new(Base, Some(String::from(ch)), i)),
 
             '\'' => tokens.push(Token::new(Power, Some(String::from(ch)), i)),
+
 
             _ => ()
         }
