@@ -1,7 +1,7 @@
 pub mod cli;
 pub mod tokenizer;
 use cli::cli_tools::*;
-use tokenizer::tokenizer::tokenizer;
+use tokenizer::tokenizer::Tokenizer;
 fn main() {
     print_controls();
     loop {
@@ -9,7 +9,9 @@ fn main() {
         println!("Enter a math expression: ");
         let expr = ask_for_expr().trim().to_string();
 
-        tokenizer(expr);
+        let token_generator = Tokenizer::new(expr);
+        
+        token_generator.run();
         println!();
         
         

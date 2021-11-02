@@ -9,7 +9,7 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, value: Option<String>, location: usize) -> Self {
+    pub fn new( token_type: TokenType, value: Option<String>, location: usize) -> Self {
         Self {
             token_type,
             value,
@@ -17,13 +17,26 @@ impl Token {
         }
     }
 
-    pub fn literal () -> HashMap<String, String> {
+    pub fn reserved_keywords (&self) -> HashMap<String, TokenType> {
         hashmap! {
-            
-
-
+            String::from("log_") => TokenType::Log,
+            String::from("sin") => TokenType::Sine,
+            String::from("tan") => TokenType::Tangent,
+            String::from("cos") => TokenType::Cosine,
+            String::from("arcsin") => TokenType::Cosine,
+            String::from("arccos") => TokenType::ArcCosine,
+            String::from("arctan") => TokenType::ArcTangent,
+            String::from("PI") => TokenType::Pi,
+            String::from("ans") => TokenType::Ans,
+            String::from("ln") => TokenType::Ln,
+            String::from("e") => TokenType::E
         }
     }
+    pub fn get_word() -> TokenType {
+        todo!()
+    }
+
+    
 }
 
 #[derive(Debug)]
