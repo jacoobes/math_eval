@@ -49,9 +49,13 @@ impl Tokenizer {
                 }
             }
         }
+        println!("{:?}", tokens);
         vec![]
     }
 
+    fn is_at_end (&self, current_location : usize) -> bool {
+        self.chars.len() == current_location
+    }
     
 
 
