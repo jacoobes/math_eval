@@ -57,7 +57,6 @@ pub enum TokenType {
     ArcSine,
     ArcCosine,
     ArcTangent,
-    Dot,
     LeftBracket,
     RightBracket,
     Log,
@@ -68,4 +67,5 @@ pub enum TokenType {
     Root,
     LeftCurly,
     RightCurly,
+    Poisoned
 }

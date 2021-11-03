@@ -7,9 +7,9 @@ fn main() {
     loop {
 
         println!("Enter a math expression: ");
-        let expr = ask_for_expr().trim().to_string();
+        let expr =ask_for_expr().trim().to_string();
 
-        let token_generator = Tokenizer::new(expr);
+        let mut token_generator = Tokenizer::new(expr);
         
         token_generator.run();
         println!();
