@@ -1,6 +1,5 @@
 use super::tokens::*;
 use crate::tokenizer::{panicker::error::CalcErr, tokens::TokenType::*};
-use core::num::dec2flt::parse;
 use std::iter::FromIterator;
 
 /**
@@ -60,30 +59,21 @@ impl Tokenizer {
                             chars.next_if(|(_, ch)| matches!(ch, '0'..='9' | '.'));
                         } else {
                             break;
-                        } 
-                    }
-                    tokens.push(
-                    if let Err(e) = parseable.parse::<f64>() {
-                            Token::new(
-                                Poisoned(CalcErr::NumParseErr(e, parseable)),
-                                None,
-                                loc,
-                                parseable.len()
-                        )  
-                    } else {
-                            Token::new(
-                                Literal,
-                                Some(parseable),
-                                loc,
-                                parseable.len()
-                            )
                         }
-                    )
+                    }
+                    tokens.push(if let Err(e) = parseable.parse::<f64>() {
+                        Token::new(
+                            Poisoned(CalcErr::NumParseErr(e, parseable.clone())),
+                            None,
+                            loc,
+                            parseable.len(),
+                        )
+                    } else {
+                        Token::new(Literal, Some(parseable.clone()), loc, parseable.len())
+                    })
                 }
                 _ => (),
             }
         }
     }
-    
-
 }
