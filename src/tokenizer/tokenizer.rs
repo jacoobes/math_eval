@@ -1,7 +1,7 @@
 use super::tokens::*;
 use crate::tokenizer::tokens::TokenType::*;
 use std::iter::FromIterator;
-use super::super::panicker::error::CalcErr;
+use crate::panicker::error::CalcErr;
 /**
 *
    Each value in Rust has a variable that’s called its owner.

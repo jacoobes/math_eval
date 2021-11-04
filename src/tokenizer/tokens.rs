@@ -1,6 +1,6 @@
 use maplit::hashmap;
 use std::collections::HashMap;
-use super::super::panicker::error::CalcErr;
+use crate::panicker::error::CalcErr;
 
 
 #[derive(Debug, Clone)]
