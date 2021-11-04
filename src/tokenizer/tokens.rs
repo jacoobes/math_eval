@@ -1,7 +1,7 @@
 use maplit::hashmap;
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     token_type: TokenType,
     value: Option<String>,
@@ -35,11 +35,10 @@ impl Token {
     pub fn get_word() -> TokenType {
         todo!()
     }
-
     
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenType {
     Literal,
     LeftParen,
@@ -67,5 +66,6 @@ pub enum TokenType {
     Root,
     LeftCurly,
     RightCurly,
-    Poisoned
+    Poisoned(),
+    EOF
 }
