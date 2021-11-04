@@ -1,7 +1,7 @@
 use maplit::hashmap;
 use std::collections::HashMap;
+use super::super::panicker::error::CalcErr;
 
-use super::panicker::error::CalcErr;
 
 #[derive(Debug, Clone)]
 pub struct Token {

@@ -1,5 +1,7 @@
 pub mod cli;
 pub mod tokenizer;
+pub mod panicker;
+
 use cli::cli_tools::*;
 use tokenizer::tokenizer::Tokenizer;
 fn main() {
