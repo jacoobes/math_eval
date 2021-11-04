@@ -62,27 +62,23 @@ impl Tokenizer {
                             break;
                         } 
                     }
-
+                    tokens.push(
                     if let Err(e) = parseable.parse::<f64>() {
-                        tokens.push(
                             Token::new(
                                 Poisoned(CalcErr::NumParseErr(e, parseable)),
                                 None,
                                 loc,
                                 parseable.len()
-                            ));
-                            
+                        )  
                     } else {
-                        tokens.push(
                             Token::new(
                                 Literal,
                                 Some(parseable),
                                 loc,
                                 parseable.len()
                             )
-                        )
-                    }
-                    
+                        }
+                    )
                 }
                 _ => (),
             }
