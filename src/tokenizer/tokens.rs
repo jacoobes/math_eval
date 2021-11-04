@@ -1,29 +1,28 @@
+use crate::panicker::error::CalcErr;
 use maplit::hashmap;
 use std::collections::HashMap;
-use crate::panicker::error::CalcErr;
-
 
 #[derive(Debug, Clone)]
 pub struct Token {
     token_type: TokenType,
     value: Option<String>,
     start: usize,
-    end: usize
+    end: usize,
 }
 
 impl Token {
-    pub fn new( token_type: TokenType, value: Option<String>, start: usize, end: usize) -> Self {
+    pub fn new(token_type: TokenType, value: Option<String>, start: usize, end: usize) -> Self {
         Self {
             token_type,
             value,
             start,
-            end
+            end,
         }
     }
 
-    pub fn reserved_keywords (&self) -> HashMap<String, TokenType> {
+    pub fn reserved_keywords(&self) -> HashMap<String, TokenType> {
         hashmap! {
-            String::from("log_") => TokenType::Log,
+            String::from("log") => TokenType::Log,
             String::from("sin") => TokenType::Sine,
             String::from("tan") => TokenType::Tangent,
             String::from("cos") => TokenType::Cosine,
@@ -39,7 +38,6 @@ impl Token {
     pub fn get_word() -> TokenType {
         todo!()
     }
-    
 }
 
 #[derive(Debug, Clone)]
@@ -71,5 +69,5 @@ pub enum TokenType {
     LeftCurly,
     RightCurly,
     Poisoned(CalcErr),
-    EOF
+    EOF,
 }
