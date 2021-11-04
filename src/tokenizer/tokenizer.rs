@@ -1,6 +1,6 @@
 use super::tokens::*;
 use crate::tokenizer::tokens::TokenType::*;
-use std::iter::{FromIterator};
+use std::iter::FromIterator;
 
 /**
 *
@@ -50,24 +50,27 @@ impl Tokenizer {
 
                 '\'' => tokens.push(Token::new(Power, Some(String::from(ch)), loc)),
 
-                '0'..='9' => {
+                '0'..='9' | '.' => {
                     let mut parseable = String::from(ch);
 
-                    while let Some( (_,parse_char)) = chars.next() {
-                      if matches!(parse_char, '0'..='9' | '.') {
-                        parseable.push(parse_char)
-                      } else {
-                         panic!("Not a parseable number"); 
-                      }
-                    } 
+                    while let Some((_, parse_char)) = chars.peek() {
+                        if matches!(parse_char, '.' | '0'..='9') {
+                            parseable.push(*parse_char);
+                            chars.next_if(|(_, ch)| matches!(ch, '0'..='9' | '.'));
+                        } else {
+                            break;
+                        }
+                    }
 
-                    if let Err(e) = parseable.parse::<f64>() {
-                        
-                    } else {}
-                        
-                    
-                },
-                _ => ()
+                    if let Ok(e) = parseable.parse::<f64>() {
+                        println!("{:?}", &e);
+                        println!("{:?}", parseable);
+                    } else {
+                        println!("bad parse");
+                        println!("{:?}", parseable);
+                    }
+                }
+                _ => (),
             }
         }
     }
