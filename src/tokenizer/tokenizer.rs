@@ -1,5 +1,6 @@
 use super::tokens::*;
-use crate::tokenizer::tokens::TokenType::*;
+use crate::tokenizer::{panicker::error::CalcErr, tokens::TokenType::*};
+use core::num::dec2flt::parse;
 use std::iter::FromIterator;
 
 /**
@@ -32,23 +33,23 @@ impl Tokenizer {
             let (loc, ch) = chars.next().unwrap();
             match ch {
                 ' ' => (),
-                '{' => tokens.push(Token::new(LeftCurly, Some(String::from(ch)), loc)),
-                '}' => tokens.push(Token::new(RightCurly, Some(String::from(ch)), loc)),
-                '[' => tokens.push(Token::new(LeftBracket, Some(String::from(ch)), loc)),
-                ']' => tokens.push(Token::new(RightBracket, Some(String::from(ch)), loc)),
-                '(' => tokens.push(Token::new(LeftParen, Some(String::from(ch)), loc)),
-                ')' => tokens.push(Token::new(RightParen, Some(String::from(ch)), loc)),
+                '{' => tokens.push(Token::new(LeftCurly, Some(String::from(ch)), loc, loc)),
+                '}' => tokens.push(Token::new(RightCurly, Some(String::from(ch)), loc, loc)),
+                '[' => tokens.push(Token::new(LeftBracket, Some(String::from(ch)), loc, loc)),
+                ']' => tokens.push(Token::new(RightBracket, Some(String::from(ch)), loc, loc)),
+                '(' => tokens.push(Token::new(LeftParen, Some(String::from(ch)), loc, loc)),
+                ')' => tokens.push(Token::new(RightParen, Some(String::from(ch)), loc, loc)),
 
-                '+' => tokens.push(Token::new(Plus, Some(String::from(ch)), loc)),
-                '-' => tokens.push(Token::new(Minus, Some(String::from(ch)), loc)),
+                '+' => tokens.push(Token::new(Plus, Some(String::from(ch)), loc, loc)),
+                '-' => tokens.push(Token::new(Minus, Some(String::from(ch)), loc, loc)),
 
-                '/' => tokens.push(Token::new(Divide, Some(String::from(ch)), loc)),
-                'x' => tokens.push(Token::new(Multiply, Some(String::from(ch)), loc)),
-                '%' => tokens.push(Token::new(Modulus, Some(String::from(ch)), loc)),
+                '/' => tokens.push(Token::new(Divide, Some(String::from(ch)), loc, loc)),
+                'x' => tokens.push(Token::new(Multiply, Some(String::from(ch)), loc, loc)),
+                '%' => tokens.push(Token::new(Modulus, Some(String::from(ch)), loc, loc)),
 
-                '_' => tokens.push(Token::new(Base, Some(String::from(ch)), loc)),
+                '_' => tokens.push(Token::new(Base, Some(String::from(ch)), loc, loc)),
 
-                '\'' => tokens.push(Token::new(Power, Some(String::from(ch)), loc)),
+                '\'' => tokens.push(Token::new(Power, Some(String::from(ch)), loc, loc)),
 
                 '0'..='9' | '.' => {
                     let mut parseable = String::from(ch);
@@ -59,19 +60,34 @@ impl Tokenizer {
                             chars.next_if(|(_, ch)| matches!(ch, '0'..='9' | '.'));
                         } else {
                             break;
-                        }
+                        } 
                     }
 
-                    if let Ok(e) = parseable.parse::<f64>() {
-                        println!("{:?}", &e);
-                        println!("{:?}", parseable);
+                    if let Err(e) = parseable.parse::<f64>() {
+                        tokens.push(
+                            Token::new(
+                                Poisoned(CalcErr::NumParseErr(e, parseable)),
+                                None,
+                                loc,
+                                parseable.len()
+                            ));
+                            
                     } else {
-                        println!("bad parse");
-                        println!("{:?}", parseable);
+                        tokens.push(
+                            Token::new(
+                                Literal,
+                                Some(parseable),
+                                loc,
+                                parseable.len()
+                            )
+                        )
                     }
+                    
                 }
                 _ => (),
             }
         }
     }
+    
+
 }

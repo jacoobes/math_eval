@@ -1,19 +1,23 @@
 use maplit::hashmap;
 use std::collections::HashMap;
 
+use super::panicker::error::CalcErr;
+
 #[derive(Debug, Clone)]
 pub struct Token {
     token_type: TokenType,
     value: Option<String>,
-    location: usize,
+    start: usize,
+    end: usize
 }
 
 impl Token {
-    pub fn new( token_type: TokenType, value: Option<String>, location: usize) -> Self {
+    pub fn new( token_type: TokenType, value: Option<String>, start: usize, end: usize) -> Self {
         Self {
             token_type,
             value,
-            location,
+            start,
+            end
         }
     }
 
@@ -66,6 +70,6 @@ pub enum TokenType {
     Root,
     LeftCurly,
     RightCurly,
-    Poisoned(),
+    Poisoned(CalcErr),
     EOF
 }
