@@ -20,7 +20,7 @@ impl Token {
         }
     }
 
-    pub fn reserved_keywords(&self) -> HashMap<String, TokenType> {
+    pub fn reserved_keywords() -> HashMap<String, TokenType> {
         hashmap! {
             String::from("log") => TokenType::Log,
             String::from("sin") => TokenType::Sine,
@@ -35,8 +35,12 @@ impl Token {
             String::from("e") => TokenType::E
         }
     }
-    pub fn get_word() -> TokenType {
-        todo!()
+    pub fn get_word( possible_reserved: &String) -> TokenType {
+        let keywords = Token::reserved_keywords();
+        match keywords.get(possible_reserved) {
+            Some(typ) => typ.to_owned(),
+            None => TokenType::Poisoned(CalcErr::UnknownKeyword(possible_reserved.clone()))
+        }
     }
 }
 
