@@ -35,6 +35,7 @@ impl Token {
             String::from("e") => TokenType::E
         }
     }
+    //if possible_reserved does not exist in reserved keywords, adds a poisoned token type
     pub fn get_word( possible_reserved: &String) -> TokenType {
         let keywords = Token::reserved_keywords();
         match keywords.get(possible_reserved) {
