@@ -1,6 +1,7 @@
 pub mod cli;
 pub mod panicker;
 pub mod tokenizer;
+pub mod parser;
 
 use cli::cli_tools::*;
 use tokenizer::tokenizer::Tokenizer;
