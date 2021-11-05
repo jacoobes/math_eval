@@ -1,0 +1,29 @@
+CFG Grammar for math_eval (subject to change)
+
+expr                -> literal 
+                     | grouping 
+                     | function_expression 
+                     | binary 
+                     | unary;
+
+grouping            -> "(" expr ")";
+
+function_expression -> "ln {" expr "}" 
+                     | "log_" expr "{" expr "}"
+                     | "arcsin {" expr "}" 
+                     | "sin {" expr "}"
+                     | "cos {" expr "}"
+                     | "arccos {" expr "}"
+                     | "tan {" expr "}"
+                     | "arctan {" expr "}"
+                     | "root_" expr {" expr "}"
+                    
+
+binary              -> expr operator expr;                 
+unary               -> ("+" | "-" | "~") expr;
+literal             ->  Number  
+                     | "PI"
+                     | "Ans"
+                     | "e";
+
+operator            -> "+" | "-" | "'" | "/" | "%" | "x" | "~"
