@@ -17,10 +17,16 @@ function_expression -> "ln"             "{" expr "}"
                      | "tan"            "{" expr "}"
                      | "arctan"         "{" expr "}"
                      | "root"("_" expr)?"{" expr "}"
+                     | "csc"            "{" expr "}" 
+                     | "sec"            "{" expr "}"
+                     | "tan"            "{" expr "}"
+                     | "arccsc"         "{" expr "}"
+                     | "arcsec"         "{" expr "}"
+                     | "arccot"         "{" expr "}"
                      | expr grouping*                     
 
 binary              -> expr operator expr;                 
-unary               -> ("+"+ | "-"+ | "~") expr;
+unary               -> ("+" | "-" | "~")* expr;
 literal             ->  Number  
                      | "PI"
                      | "Ans"
