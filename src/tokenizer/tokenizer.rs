@@ -71,7 +71,7 @@ impl Tokenizer {
                 'x' => self.tokens.push(Token::new(Multiply, Some(String::from(ch)), loc, loc)),
                 '%' => self.tokens.push(Token::new(Modulus, Some(String::from(ch)), loc, loc)),
                 '_' => self.tokens.push(Token::new(Base, Some(String::from(ch)), loc, loc)),
-               '\'' => self.tokens.push(Token::new(Power, Some(String::from(ch)), loc, loc)),
+                '^' => self.tokens.push(Token::new(Power, Some(String::from(ch)), loc, loc)),
                 '~' => self.tokens.push(Token::new(Squiggly, Some(String::from(ch)), loc, loc)),
                 '0'..='9' | '.' => {
                     let parseable = self.consume_num(ch);

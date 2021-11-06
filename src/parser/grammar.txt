@@ -17,7 +17,7 @@ function_expression -> "ln {" expr "}"
                      | "tan {" expr "}"
                      | "arctan {" expr "}"
                      | "root_" expr {" expr "}"
-                    
+                     | expr grouping                     
 
 binary              -> expr operator expr;                 
 unary               -> ("+" | "-" | "~") expr;
@@ -26,4 +26,4 @@ literal             ->  Number
                      | "Ans"
                      | "e";
 
-operator            -> "+" | "-" | "'" | "/" | "%" | "x" | "~"
+operator            -> "+" | "-" | "^" | "/" | "%" | "x" | "over"
