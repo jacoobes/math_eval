@@ -6,21 +6,21 @@ expr                -> literal
                      | binary 
                      | unary;
 
-grouping            -> "(" expr ")";
+grouping            -> ( "(" | "[") expr ( "]" | ")" );
 
-function_expression -> "ln {" expr "}" 
-                     | "log_" expr "{" expr "}"
-                     | "arcsin {" expr "}" 
-                     | "sin {" expr "}"
-                     | "cos {" expr "}"
-                     | "arccos {" expr "}"
-                     | "tan {" expr "}"
-                     | "arctan {" expr "}"
-                     | "root_" expr {" expr "}"
-                     | expr grouping                     
+function_expression -> "ln"             "{" expr "}" 
+                     | "log"("_" expr)? "{" expr "}"
+                     | "arcsin          "{" expr "}" 
+                     | "sin"            "{" expr "}"
+                     | "cos"            "{" expr "}"
+                     | "arccos"         "{" expr "}"
+                     | "tan"            "{" expr "}"
+                     | "arctan"         "{" expr "}"
+                     | "root"("_" expr)?"{" expr "}"
+                     | expr grouping*                     
 
 binary              -> expr operator expr;                 
-unary               -> ("+" | "-" | "~") expr;
+unary               -> ("+"+ | "-"+ | "~") expr;
 literal             ->  Number  
                      | "PI"
                      | "Ans"
