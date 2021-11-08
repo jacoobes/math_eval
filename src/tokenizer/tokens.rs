@@ -39,7 +39,10 @@ impl Token {
             String::from("ans") => TokenType::Ans,
             String::from("ln") => TokenType::Ln,
             String::from("e") => TokenType::E,
-            String::from("root") => TokenType::Root
+            String::from("root") => TokenType::Root,
+            String::from("rad") => TokenType::Rad,
+            String::from("degree") => TokenType::Rad
+
         }
     }
     //if possible_reserved does not exist in reserved keywords, adds a poisoned token type
@@ -88,5 +91,7 @@ pub enum TokenType {
     RightCurly,
     Poisoned(CalcErr),
     Squiggly,
+    Rad,
+    Degree,
     EOF,
 }

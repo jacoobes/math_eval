@@ -23,6 +23,8 @@ function_expression -> "ln"             "{" expr "}"
                      | "arccsc"         "{" expr "}"
                      | "arcsec"         "{" expr "}"
                      | "arccot"         "{" expr "}"
+                     | "degree          "{" expr "}"
+                     | "rad"            "{" expr "}"
                      | expr grouping*                     
 
 binary              -> expr operator expr;                 
