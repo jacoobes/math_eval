@@ -79,8 +79,6 @@ pub enum TokenType {
     ArcSine,
     ArcCosine,
     ArcTangent,
-    LeftBracket,
-    RightBracket,
     Log,
     Base,
     Ans,

@@ -61,8 +61,6 @@ impl Tokenizer {
                 ' ' => (),
                 '{' => self.tokens.push(Token::new(LeftCurly, Some(String::from(ch)), loc, loc)),
                 '}' => self.tokens.push(Token::new(RightCurly, Some(String::from(ch)), loc, loc)),
-                '[' => self.tokens.push(Token::new(LeftBracket, Some(String::from(ch)), loc, loc)),
-                ']' => self.tokens.push(Token::new(RightBracket, Some(String::from(ch)), loc, loc)),
                 '(' => self.tokens.push(Token::new(LeftParen, Some(String::from(ch)), loc, loc)),
                 ')' => self.tokens.push(Token::new(RightParen, Some(String::from(ch)), loc, loc)),
                 '+' => self.tokens.push(Token::new(Plus, Some(String::from(ch)), loc, loc)),
