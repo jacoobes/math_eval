@@ -1,6 +1,6 @@
 use std::fmt::Display;
 use std::num::ParseFloatError;
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum CalcErr {
     NumParseErr(ParseFloatError, String),
     UnknownKeyword(String),

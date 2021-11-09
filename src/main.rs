@@ -13,6 +13,7 @@ fn main() {
 
         let mut token_generator = Tokenizer::new(&expr);
         token_generator.run();
+        
         println!("{:?}", token_generator.tokens)
     }
 }

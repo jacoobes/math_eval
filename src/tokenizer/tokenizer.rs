@@ -1,8 +1,7 @@
 use super::tokens::*;
 use crate::panicker::error::CalcErr;
 use crate::tokenizer::tokens::TokenType::*;
-use std::iter::FromIterator;
-use std::iter::Peekable;
+use std::iter::{FromIterator, Peekable};
 use std::vec::IntoIter;
 
 pub struct Tokenizer {
@@ -28,7 +27,6 @@ impl Tokenizer {
     //consumes nums
     fn consume_num(&mut self, start: char) -> String {
         let mut parseable = String::from(start);
-
         while let Some((_, possible_ch)) = self.peek() {
             if matches!(possible_ch, '.' | '0'..='9') {
                 parseable.push(
