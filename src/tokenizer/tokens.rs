@@ -1,13 +1,13 @@
-use crate::panicker::error::CalcErr;
+use crate::panicker::lex_error::LexErr;
 use maplit::hashmap;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct Token {
     pub token_type: TokenType,
-    value: Option<String>,
-    start: usize,
-    end: usize,
+    pub value: Option<String>,
+    pub start: usize,
+    pub end: usize,
 }
 
 impl Token {
@@ -17,6 +17,15 @@ impl Token {
             value,
             start,
             end,
+        }
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            token_type : TokenType::Empty,
+            value: None,
+            start: 0,
+            end: 0
         }
     }
 
@@ -41,7 +50,7 @@ impl Token {
             "e" => TokenType::E,
             "root" => TokenType::Root,
             "rad" => TokenType::Rad,
-            "degree" => TokenType::Rad
+            "degree" => TokenType::Degree
 
         }
     }
@@ -50,12 +59,12 @@ impl Token {
         let keywords = Token::reserved_keywords();
         match keywords.get(possible_reserved) {
             Some(typ) => typ.to_owned(),
-            None => TokenType::Poisoned(CalcErr::UnknownKeyword(possible_reserved.to_string()))
+            None => TokenType::Poisoned(LexErr::UnknownKeyword(possible_reserved.to_string()))
         }
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq,)]
 pub enum TokenType {
     Literal,
     LeftParen,
@@ -87,9 +96,10 @@ pub enum TokenType {
     Root,
     LeftCurly,
     RightCurly,
-    Poisoned(CalcErr),
+    Poisoned(LexErr),
     Squiggly,
     Rad,
     Degree,
     EOF,
+    Empty
 }

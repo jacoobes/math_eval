@@ -1,12 +1,12 @@
 use super::expr::Expr;
 #[derive(Debug)]
-struct Literal {
+pub struct Number {
     value : Option<f64>
 }
 
-impl Expr for Literal {}
+impl Expr for Number {}
 
-impl Literal {
+impl Number {
     pub fn new(value: Option<f64>) -> Self {
         Self {
             value

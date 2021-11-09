@@ -1,6 +1,7 @@
 pub mod expr;
-mod binary;
-mod function_expr;
-mod grouping;
-mod literal;
-mod unary;
+pub mod binary;
+pub mod function_expr;
+pub mod grouping;
+pub mod number;
+pub mod unary;
+pub mod parse_error;

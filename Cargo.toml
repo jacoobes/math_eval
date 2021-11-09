@@ -7,3 +7,4 @@ edition = "2018"
 
 [dependencies]
 maplit = "1.0.2"
+peekmore = "1.0.0"

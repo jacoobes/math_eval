@@ -1,5 +1,5 @@
 use super::tokens::*;
-use crate::panicker::error::CalcErr;
+use crate::panicker::lex_error::LexErr;
 use crate::tokenizer::tokens::TokenType::*;
 use std::iter::{FromIterator, Peekable};
 use std::vec::IntoIter;
@@ -75,7 +75,7 @@ impl Tokenizer {
 
                     //if token is not parseable, push a poisoned token (erroring in parsing stage), else push a number
                     self.tokens.push(if let Err(e) = parseable.parse::<f64>() {
-                        Token::new(Poisoned(CalcErr::NumParseErr(e, parseable)), None, loc, len)
+                        Token::new(Poisoned(LexErr::NumParseErr(e, parseable)), None, loc, len)
                     } else {
                         Token::new(Literal, Some(parseable), loc, len)
                     })
@@ -89,7 +89,7 @@ impl Tokenizer {
                 }
                 //anything not picked up by lexer will be poisoned
                 _ => self.tokens.push(Token::new(
-                    Poisoned(CalcErr::UnknownKeyword(ch.to_string())),
+                    Poisoned(LexErr::UnknownKeyword(ch.to_string())),
                     Some(ch.to_string()),
                     loc,
                     loc,
