@@ -3,13 +3,13 @@ use super::expr::Expr;
 
 
 #[derive(Debug)]
-struct Grouping <V: Expr> {
-    value: V
+pub struct Grouping {
+    value: Box<dyn Expr>
 }
-impl <V: Expr> Expr for Grouping <V> {}
+impl Expr for Grouping  {}
 
- impl <V: Expr> Grouping <V> {
-    pub fn new( value: V) -> Self {
+ impl  Grouping  {
+    pub fn new( value: Box< dyn Expr>) -> Self {
         Self {
             value
         }

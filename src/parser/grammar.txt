@@ -6,7 +6,7 @@ expr                -> literal
                      | binary 
                      | unary;
 
-grouping            -> ( "(" | "{") expr ( "}" | ")" );
+grouping            -> "(" expr ")";
 
 function_expression -> "ln"              grouping 
                      | "log"("_" expr)?  grouping

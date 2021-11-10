@@ -96,6 +96,6 @@ impl Tokenizer {
                 )),
             }
         }
-        self.tokens.push(Token::new(EOF, None, 0, self.chars.len()))
+        self.tokens.push(Token::new(EOF, None, 0, self.chars.len()));
     }
 }

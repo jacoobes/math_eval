@@ -4,14 +4,14 @@ use super::expr::Expr;
 
 
 #[derive(Debug)]
-struct FnExpr <V: Expr> {
+pub struct FnExpr {
     function : Token,
-    value: V
+    value: Box<dyn Expr>
 }
-impl <V: Expr> Expr for FnExpr<V> {}
+impl Expr for FnExpr {}
 
-impl <V: Expr> FnExpr<V> {
-    pub fn new(function: Token, value: V) -> Self {
+impl  FnExpr {
+    pub fn new(function: Token, value: Box<dyn Expr>) -> Self {
         Self {
             function,
             value
