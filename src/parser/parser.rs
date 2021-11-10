@@ -1,27 +1,27 @@
 use peekmore::{PeekMore, PeekMoreIterator};
 
-use crate::{ tokenizer::tokens::{Token, TokenType::{*, self}}};
-use crate::parser::expr::parse_error::ParseErr;
 use super::expr::expr::*;
-use crate::parser::expr::grouping::Grouping;
 use crate::parser::expr::function_expr::FnExpr;
-use std::{f64::consts::PI, vec::IntoIter};
+use crate::parser::expr::grouping::Grouping;
 use crate::parser::expr::number::Number;
-pub struct Parser
- {
-    tokens :  PeekMoreIterator<IntoIter<Token>>,
+use crate::parser::expr::parse_error::ParseErr;
+use crate::tokenizer::tokens::{
+    Token,
+    TokenType::{self, *},
+};
+use std::{f64::consts::PI, vec::IntoIter};
+pub struct Parser {
+    tokens: PeekMoreIterator<IntoIter<Token>>,
 }
 
-
 impl Parser {
-
-    pub fn new (tokens: Vec<Token>) -> Self {
+    pub fn new(tokens: Vec<Token>) -> Self {
         Self {
-            tokens : tokens.into_iter().peekmore()
+            tokens: tokens.into_iter().peekmore(),
         }
     }
 
-    pub fn parse(&mut self) -> Vec<Box<dyn Expr>>  {
+    pub fn parse(&mut self) -> Vec<Box<dyn Expr>> {
         let mut tree = vec![];
         while !self.is_at_end() {
             tree.push(self.expr())
@@ -30,17 +30,16 @@ impl Parser {
     }
 
     fn expr(&mut self) -> Box<dyn Expr> {
-       match self.peek() { 
-           Some(_)  => self.fn_expr(),                 
-           None => self.literal()
-           
-       }
+        match self.peek() {
+            Some(_) => self.fn_expr(),
+            None => self.literal(),
+        }
     }
 
     fn fn_expr(&mut self) -> Box<dyn Expr> {
         let mut possible_fn_expr = self.term();
         // match self.consume() {
-        //     t if matches!(&t.token_type, 
+        //     t if matches!(&t.token_type,
         //         Ln | Rad | Degree | Sine | Cosine | Tangent | Secant | Cosecant | ArcCosine | ArcSine | ArcTangent |
         //         ArcCot | ArcCsc | ArcSec) =>    {
         //             let expr = self.expr();
@@ -59,54 +58,47 @@ impl Parser {
     fn term(&mut self) -> Box<dyn Expr> {
         self.factor()
     }
-    
+
     fn factor(&mut self) -> Box<dyn Expr> {
         self.literal()
     }
 
     fn literal(&mut self) -> Box<dyn Expr> {
         match self.consume() {
-            tok if matches!(tok.token_type, LeftCurly | LeftParen) => {
+            tok if tok.token_type == LeftParen => {
                 let expr = self.expr();
                 self.consume_type(&RightParen);
                 Box::new(Grouping::new(expr))
             }
-            tok if matches!(tok.token_type, Literal )=>{
-                let value = if let Some(num_resolvable) = tok.value {
-                    num_resolvable.parse::<f64>().ok()
-                } else {
-                    None
-                };
+            tok if tok.token_type == Literal => {
+                let value = tok.value.unwrap().parse::<f64>().ok();
                 Box::new(Number::new(value))
-                
             }
-            tok if matches!(tok.token_type, Pi) => {
-                Box::new(Number::new(Some(PI)))
-            }
-            tok if matches!(tok.token_type, Ans) => {
-                Box::new(Number::new(None))
-            }
+            tok if matches!(tok.token_type, Pi) => Box::new(Number::new(Some(PI))),
+            tok if matches!(tok.token_type, Ans) => Box::new(Number::new(None)),
 
-            tok => Box::new(Number::new(None))
+            tok => Box::new(Number::new(None)),
         }
     }
 
-     //advance the iterator
-     fn consume(&mut self) -> Token {
+    //advance the iterator
+    fn consume(&mut self) -> Token {
         self.tokens.next().unwrap()
     }
 
     fn consume_type(&mut self, typ: &TokenType) -> Token {
         if let Some(x) = self.peek() {
             match &x.token_type {
-                Poisoned(err) => { 
-                    println!("{}", &err); 
-                },
-                _ if &x.token_type == typ => { self.consume(); },
+                Poisoned(err) => {
+                    println!("{}", &err);
+                }
+                _ if &x.token_type == typ => {
+                    self.consume();
+                }
                 other => {
-                   let poison = ParseErr::Expected(Box::new(typ.to_owned()), Box::new(other.to_owned()));
-                   println!("{}",poison);
-                   
+                    let poison =
+                        ParseErr::Expected(Box::new(typ.to_owned()), Box::new(other.to_owned()));
+                    println!("{}", poison);
                 }
             }
             self.consume()
@@ -124,12 +116,11 @@ impl Parser {
         self.tokens.peek_next()
     }
 
-     fn is_at_end(&mut self) -> bool {
+    fn is_at_end(&mut self) -> bool {
         match self.peek() {
             Some(token) if matches!(token.token_type, EOF) => true,
             Some(_) => false,
-            None => true
+            None => true,
         }
-     }
+    }
 }
-

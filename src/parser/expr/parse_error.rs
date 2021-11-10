@@ -2,8 +2,8 @@ use crate::tokenizer::tokens::{Token, TokenType};
 use std::fmt::Display;
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParseErr {
-    Expected( Box<TokenType>,  Box<TokenType>),
-    ExpectedAny(Box<Vec<TokenType>>, Box<TokenType>)
+    Expected(Box<TokenType>, Box<TokenType>),
+    ExpectedAny(Box<Vec<TokenType>>, Box<TokenType>),
 }
 
 impl Display for ParseErr {
@@ -15,7 +15,6 @@ impl Display for ParseErr {
             ParseErr::ExpectedAny(wanted, got) => {
                 write!(f, "Expected : {:?} \n\n  Got {:?}", *wanted, *got)
             }
-
         }
     }
 }
