@@ -74,10 +74,20 @@ impl Parser {
                 let value = tok.value.unwrap().parse::<f64>().ok();
                 Box::new(Number::new(value))
             }
-            tok if matches!(tok.token_type, Pi) => Box::new(Number::new(Some(PI))),
-            tok if matches!(tok.token_type, Ans) => Box::new(Number::new(None)),
+            tok if tok.token_type == Pi => Box::new(Number::new(Some(PI))),
+            tok if tok.token_type == Ans => Box::new(Number::new(None)),
 
-            tok => Box::new(Number::new(None)),
+            tok => {
+                match tok.token_type {
+                    Poisoned(err) => {
+                        println!("{}", &err);
+                        Box::new(Number::new(None))
+                    }
+                    _ => {
+                        Box::new(Number::new(None))
+                    }
+                }
+            },
         }
     }
 
