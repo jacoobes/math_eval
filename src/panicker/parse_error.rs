@@ -1,9 +1,12 @@
 use crate::tokenizer::tokens::{Token, TokenType};
 use std::fmt::Display;
+
+use super::lex_error::LexErr;
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParseErr {
     Expected(Token, Box<TokenType>),
     EOF,
+    Lex(Token)
 }
 
 impl Display for ParseErr {
@@ -15,6 +18,12 @@ impl Display for ParseErr {
             ParseErr::EOF => {
                 write!(f, "Unexpected end of input!")
             }
+            ParseErr::Lex(tok) => {
+                match &tok.token_type {
+                    TokenType::Poisoned(er) => write!(f, "{}", er),
+                    _ => write!(f, "Unexpected!")
+                }
+            },
         }
     }
 }
