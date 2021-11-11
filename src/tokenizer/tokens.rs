@@ -2,7 +2,7 @@ use crate::panicker::lex_error::LexErr;
 use maplit::hashmap;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
     pub value: Option<String>,

@@ -3,5 +3,4 @@ pub mod expr;
 pub mod function_expr;
 pub mod grouping;
 pub mod number;
-pub mod parse_error;
 pub mod unary;

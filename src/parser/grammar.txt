@@ -8,23 +8,23 @@ expr                -> literal
 
 grouping            -> "(" expr ")";
 
-function_expression -> "ln"              grouping 
-                     | "log"("_" expr)?  grouping
-                     | "arcsin           grouping 
-                     | "sin"             grouping
-                     | "cos"             grouping
-                     | "arccos"          grouping
-                     | "tan"             grouping
-                     | "arctan"          grouping
-                     | "root"("_" expr)? grouping
-                     | "csc"             grouping 
-                     | "sec"             grouping
-                     | "tan"             grouping
-                     | "arccsc"          grouping
-                     | "arcsec"          grouping
-                     | "arccot"          grouping
-                     | "degree           grouping
-                     | "rad"             grouping
+function_expression -> "ln"              "{" expr "}" 
+                     | "log"("_" expr)?  "{" expr "}"
+                     | "arcsin           "{" expr "}" 
+                     | "sin"             "{" expr "}"
+                     | "cos"             "{" expr "}"
+                     | "arccos"          "{" expr "}"
+                     | "tan"             "{" expr "}"
+                     | "arctan"          "{" expr "}"
+                     | "root"("_" expr)? "{" expr "}"
+                     | "csc"             "{" expr "}" 
+                     | "sec"             "{" expr "}"
+                     | "tan"             "{" expr "}"
+                     | "arccsc"          "{" expr "}"
+                     | "arcsec"          "{" expr "}"
+                     | "arccot"          "{" expr "}"
+                     | "degree           "{" expr "}"
+                     | "rad"             "{" expr "}"
                      | expr              grouping*                     
 
 binary              -> expr operator expr;                 

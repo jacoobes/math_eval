@@ -4,11 +4,11 @@ use super::expr::expr::*;
 use crate::parser::expr::function_expr::FnExpr;
 use crate::parser::expr::grouping::Grouping;
 use crate::parser::expr::number::Number;
-use crate::parser::expr::parse_error::ParseErr;
 use crate::tokenizer::tokens::{
     Token,
     TokenType::{self, *},
 };
+use crate::panicker::parse_error::ParseErr;
 use std::{f64::consts::PI, vec::IntoIter};
 pub struct Parser {
     tokens: PeekMoreIterator<IntoIter<Token>>,
@@ -20,8 +20,10 @@ impl Parser {
             tokens: tokens.into_iter().peekmore(),
         }
     }
-
+    //anyhow::Result<T>
     pub fn parse(&mut self) -> Vec<Box<dyn Expr>> {
+
+        
         let mut tree = vec![];
         while !self.is_at_end() {
             tree.push(self.expr())
@@ -64,30 +66,39 @@ impl Parser {
     }
 
     fn literal(&mut self) -> Box<dyn Expr> {
-        match self.consume() {
-            tok if tok.token_type == LeftParen => {
+        match self.peek() {
+            Some(tok) if tok.token_type == LeftParen => {
+                self.consume();
                 let expr = self.expr();
                 self.consume_type(&RightParen);
                 Box::new(Grouping::new(expr))
             }
-            tok if tok.token_type == Literal => {
-                let value = tok.value.unwrap().parse::<f64>().ok();
+            Some(tok) if tok.token_type == Literal => {
+                let literal = self.consume();
+                let value = literal.value.unwrap().parse::<f64>().ok();
                 Box::new(Number::new(value))
             }
-            tok if tok.token_type == Pi => Box::new(Number::new(Some(PI))),
-            tok if tok.token_type == Ans => Box::new(Number::new(None)),
-
-            tok => {
-                match tok.token_type {
-                    Poisoned(err) => {
-                        println!("{}", &err);
+            Some(tok) if tok.token_type == Pi => {
+                self.consume();
+                Box::new(Number::new(Some(PI)))
+            }
+            Some(tok) if tok.token_type == E => {
+                self.consume();
+                Box::new(Number::new(Some(std::f64::consts::E)))
+            }
+            Some(_) => {
+                let other = self.consume();
+                match other.token_type {
+                    Poisoned(_) => {
+                        println!("poison");
                         Box::new(Number::new(None))
                     }
                     _ => {
                         Box::new(Number::new(None))
                     }
                 }
-            },
+            }
+            None => Box::new(Number::new(None))
         }
     }
 
@@ -96,25 +107,24 @@ impl Parser {
         self.tokens.next().unwrap()
     }
 
-    fn consume_type(&mut self, typ: &TokenType) -> Token {
+    fn consume_type(&mut self, typ: &TokenType) {
         if let Some(x) = self.peek() {
             match &x.token_type {
-                Poisoned(err) => {
-                    println!("{}", &err);
+                Poisoned(_) => {
+                    self.consume();
                 }
                 _ if &x.token_type == typ => {
                     self.consume();
-                }
+                },
+                other if other == &EOF => {
+                    panic!("{}", ParseErr::EOF);
+                },
                 other => {
-                    let poison =
-                        ParseErr::Expected(Box::new(typ.to_owned()), Box::new(other.to_owned()));
-                    println!("{}", poison);
+                    let poison =  ParseErr::Expected(x.clone(), Box::new(other.to_owned()));
+                    panic!("{}", poison);
                 }
             }
-            self.consume()
-        } else {
-            Token::empty()
-        }
+        } 
     }
 
     //check the next value, does not advance
@@ -128,8 +138,7 @@ impl Parser {
 
     fn is_at_end(&mut self) -> bool {
         match self.peek() {
-            Some(token) if matches!(token.token_type, EOF) => true,
-            Some(_) => false,
+            Some(token) => { if token.token_type == EOF { true } else { false } }
             None => true,
         }
     }

@@ -12,7 +12,7 @@ fn main() {
     loop {
         println!("Enter a math expression: ");
         let expr = ask_for_expr().trim().to_string();
-
+        if expr == "end" { break; }
         let mut token_generator = Tokenizer::new(&expr);
         token_generator.run();
         

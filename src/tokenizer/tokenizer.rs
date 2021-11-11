@@ -1,3 +1,5 @@
+use peekmore::{PeekMore, PeekMoreIterator};
+
 use super::tokens::*;
 use crate::panicker::lex_error::LexErr;
 use crate::tokenizer::tokens::TokenType::*;
@@ -52,29 +54,33 @@ impl Tokenizer {
         parseable
     }
 
+    fn add_token(&mut self, token : Token) {
+        self.tokens.push(token)
+    }
+
     pub fn run(&mut self) {
         while let Some(_) = self.peek() {
             let (loc, ch) = self.consume().unwrap();
             match ch {
                 ' ' => (),
-                '{' => self.tokens.push(Token::new(LeftCurly, Some(String::from(ch)), loc, loc)),
-                '}' => self.tokens.push(Token::new(RightCurly, Some(String::from(ch)), loc, loc)),
-                '(' => self.tokens.push(Token::new(LeftParen, Some(String::from(ch)), loc, loc)),
-                ')' => self.tokens.push(Token::new(RightParen, Some(String::from(ch)), loc, loc)),
-                '+' => self.tokens.push(Token::new(Plus, Some(String::from(ch)), loc, loc)),
-                '-' => self.tokens.push(Token::new(Minus, Some(String::from(ch)), loc, loc)),
-                '/' => self.tokens.push(Token::new(Divide, Some(String::from(ch)), loc, loc)),
-                'x' => self.tokens.push(Token::new(Multiply, Some(String::from(ch)), loc, loc)),
-                '%' => self.tokens.push(Token::new(Modulus, Some(String::from(ch)), loc, loc)),
-                '_' => self.tokens.push(Token::new(Base, Some(String::from(ch)), loc, loc)),
-                '^' => self.tokens.push(Token::new(Power, Some(String::from(ch)), loc, loc)),
-                '~' => self.tokens.push(Token::new(Squiggly, Some(String::from(ch)), loc, loc)),
+                '{' => self.add_token(Token::new(LeftCurly, Some(String::from(ch)), loc, loc)),
+                '}' => self.add_token(Token::new(RightCurly, Some(String::from(ch)), loc, loc)),
+                '(' => self.add_token(Token::new(LeftParen, Some(String::from(ch)), loc, loc)),
+                ')' => self.add_token(Token::new(RightParen, Some(String::from(ch)), loc, loc)),
+                '+' => self.add_token(Token::new(Plus, Some(String::from(ch)), loc, loc)),
+                '-' => self.add_token(Token::new(Minus, Some(String::from(ch)), loc, loc)),
+                '/' => self.add_token(Token::new(Divide, Some(String::from(ch)), loc, loc)),
+                'x' => self.add_token(Token::new(Multiply, Some(String::from(ch)), loc, loc)),
+                '%' => self.add_token(Token::new(Modulus, Some(String::from(ch)), loc, loc)),
+                '_' => self.add_token(Token::new(Base, Some(String::from(ch)), loc, loc)),
+                '^' => self.add_token(Token::new(Power, Some(String::from(ch)), loc, loc)),
+                '~' => self.add_token(Token::new(Squiggly, Some(String::from(ch)), loc, loc)),
                 '0'..='9' | '.' => {
                     let parseable = self.consume_num(ch);
                     let len = parseable.len();
 
                     //if token is not parseable, push a poisoned token (erroring in parsing stage), else push a number
-                    self.tokens.push(if let Err(e) = parseable.parse::<f64>() {
+                    self.add_token(if let Err(e) = parseable.parse::<f64>() {
                         Token::new(Poisoned(LexErr::NumParseErr(e, parseable)), None, loc, len)
                     } else {
                         Token::new(Literal, Some(parseable), loc, len)
@@ -85,10 +91,10 @@ impl Tokenizer {
                     let parseable = self.consume_str(ch);
                     let len = parseable.len();
                     let token_type = Token::get_word(&parseable);
-                    self.tokens.push(Token::new(token_type, Some(parseable), loc, len))
+                    self.add_token(Token::new(token_type, Some(parseable), loc, len))
                 }
                 //anything not picked up by lexer will be poisoned
-                _ => self.tokens.push(Token::new(
+                _ => self.add_token(Token::new(
                     Poisoned(LexErr::UnknownKeyword(ch.to_string())),
                     Some(ch.to_string()),
                     loc,
@@ -96,6 +102,6 @@ impl Tokenizer {
                 )),
             }
         }
-        self.tokens.push(Token::new(EOF, None, 0, self.chars.len()));
+        self.add_token(Token::new(EOF, None, 0, self.chars.len()));
     }
 }
