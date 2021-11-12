@@ -6,7 +6,6 @@ pub mod parser;
 use cli::cli_tools::*;
 use tokenizer::tokenizer::Tokenizer;
 
-use crate::parser::parser::Parser;
 fn main() {
     print_controls();
     loop {
@@ -15,8 +14,6 @@ fn main() {
         if expr == "end" { break; }
         let mut token_generator = Tokenizer::new(&expr);
         token_generator.run();
-        
-        let mut parser = Parser::new(token_generator.tokens);
-        println!("{:?} \n\n", parser.parse());
+        println!("{:?}", token_generator.tokens);
     }
 }

@@ -5,27 +5,12 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
-    pub value: Option<String>,
-    pub start: usize,
-    pub end: usize,
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, value: Option<String>, start: usize, end: usize) -> Self {
+    pub fn new(token_type: TokenType) -> Self {
         Self {
             token_type,
-            value,
-            start,
-            end,
-        }
-    }
-
-    pub fn empty() -> Self {
-        Self {
-            token_type : TokenType::Empty,
-            value: None,
-            start: 0,
-            end: 0
         }
     }
 
@@ -44,10 +29,10 @@ impl Token {
             "arcsin" => TokenType::ArcSine,
             "arccos" => TokenType::ArcCosine,
             "arctan" => TokenType::ArcTangent,
-            "PI" => TokenType::Pi,
-            "ans" => TokenType::Ans,
+            "PI" => TokenType::Pi(std::f64::consts::PI),
+            "ans" => TokenType::Ans(None),
             "ln" => TokenType::Ln,
-            "e" => TokenType::E,
+            "e" => TokenType::E(std::f64::consts::E),
             "root" => TokenType::Root,
             "rad" => TokenType::Rad,
             "degree" => TokenType::Degree
@@ -66,10 +51,13 @@ impl Token {
 
 #[derive(Debug, Clone, PartialEq,)]
 pub enum TokenType {
-    Literal,
-    LeftParen,
-    RightParen,
-    Pi,
+    Term(char),
+    Factor(char),
+    FnBase(String),
+    Function(String),
+    Literal(f64),
+    Paren(char),
+    Pi(f64),
     Sine,
     Cosecant,
     ArcCsc,
@@ -79,27 +67,19 @@ pub enum TokenType {
     Tangent,
     Cotangent,
     ArcCot,
-    Power,
-    Minus,
-    Plus,
-    Divide,
-    Multiply,
-    Modulus,
+    Power(char),
     ArcSine,
     ArcCosine,
     ArcTangent,
     Log,
-    Base,
-    Ans,
+    Base(char),
+    Ans(Option<f64>),
     Ln,
-    E,
+    E(f64),
     Root,
-    LeftCurly,
-    RightCurly,
+    Curly(char),
     Poisoned(LexErr),
-    Squiggly,
+    Squiggly(char),
     Rad,
     Degree,
-    EOF,
-    Empty
 }
