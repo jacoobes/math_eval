@@ -9,9 +9,7 @@ pub struct Token {
 
 impl Token {
     pub fn new(token_type: TokenType) -> Self {
-        Self {
-            token_type,
-        }
+        Self { token_type }
     }
 
     pub fn reserved_keywords() -> HashMap<&'static str, TokenType> {
@@ -40,16 +38,16 @@ impl Token {
         }
     }
     //if possible_reserved does not exist in reserved keywords, adds a poisoned token type
-    pub fn get_word( possible_reserved: &str) -> TokenType {
+    pub fn get_word(possible_reserved: &str) -> TokenType {
         let keywords = Token::reserved_keywords();
         match keywords.get(possible_reserved) {
             Some(typ) => typ.to_owned(),
-            None => TokenType::Poisoned(LexErr::UnknownKeyword(possible_reserved.to_string()))
+            None => TokenType::Poisoned(LexErr::UnknownKeyword(possible_reserved.to_string())),
         }
     }
 }
 
-#[derive(Debug, Clone, PartialEq,)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     Term(char),
     Factor(char),
@@ -82,4 +80,5 @@ pub enum TokenType {
     Squiggly(char),
     Rad,
     Degree,
+    
 }
