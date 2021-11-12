@@ -18,10 +18,25 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
+        
         Self {
             tokens: tokens.into_iter().peekmore(),
             errors: vec![]
         }
+    }
+
+    pub fn check_lexer_errors(tokens: &Vec<Token>) -> bool {
+        let mut had_err = false;
+        for token in tokens {
+            match &token.token_type {
+                Poisoned(e) =>  {
+                    println!("{}", &e);
+                    had_err = true;
+                },
+                _ => ()
+            }
+        };
+        had_err
     }
 }
 //     //anyhow::Result<T>
