@@ -49,9 +49,7 @@ impl Parser {
             match &token.token_type {
                 Literal(_) | Sine | Cosecant | Cotangent | Secant | Cosine | Tangent 
                 | Ln | Log | ArcCosine | ArcCot | ArcCsc | ArcSine | ArcTangent | Degree 
-                | Rad | Root | ArcSec => {
-                    break;
-                },
+                | Rad | Root | ArcSec =>  break,
                 _ => () 
             }
             self.consume();
