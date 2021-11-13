@@ -1,7 +1,6 @@
 use peekmore::{PeekMore, PeekMoreIterator};
 
 use super::expr::expr::*;
-use crate::parser::expr::fn_expr_w_base::FnWithBase;
 use crate::parser::expr::function_expr::FnExpr;
 use crate::parser::expr::grouping::Grouping;
 use crate::parser::expr::number::Number;
@@ -10,7 +9,7 @@ use crate::tokenizer::tokens::{
     TokenType::{self, *},
 };
 use crate::panicker::parse_error::ParseErr;
-use std::{f64::consts::PI, vec::IntoIter};
+use std::vec::IntoIter;
 pub struct Parser {
     tokens: PeekMoreIterator<IntoIter<Token>>,
     had_errors: bool

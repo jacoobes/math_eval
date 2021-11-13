@@ -51,7 +51,6 @@ impl Token {
 pub enum TokenType {
     Term(char),
     Factor(char),
-    FnBase(String),
     Function(String),
     Literal(f64),
     Paren(char),
