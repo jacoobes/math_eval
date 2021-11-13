@@ -28,6 +28,7 @@ impl Parser {
 
     pub fn check_lexer_errors(tokens: &Vec<Token>) -> bool {
         let mut had_err = false;
+        println!("{:?}", tokens);
         for token in tokens {
             match &token.token_type {
                 Poisoned(e) => {
@@ -125,8 +126,11 @@ impl Parser {
     }
     fn consume_type(&mut self, typ: TokenType) {
       if let Some(tok) = self.consume() {
-          if typ == tok.token_type { () } else { self.had_errors = true; }
-        } 
+          if typ != tok.token_type { println!("{}", ParseErr::Expected((typ, tok.token_type))); self.had_errors = true}
+        }  else {
+            self.had_errors = true;
+            println!("{}", ParseErr::EOF)
+        }
     }
     fn block(&mut self) -> Box<dyn Expr> {
         self.consume_type(Curly('{'));
