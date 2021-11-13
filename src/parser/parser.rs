@@ -64,16 +64,12 @@ impl Parser {
                       if &token.token_type == &Base { 
                         self.consume();  
                         let base = Some(self.expr());
-                        self.consume_type(Curly('{'));
-                        let value = self.expr();
-                        self.consume_type(Curly('}'));
-                        Box::new(FnExpr::new(fn_name, base, value))
+                        let fn_block = self.block();
+                        Box::new(FnExpr::new(fn_name, base, fn_block))
                       } else {
                          self.consume();
-                         self.consume_type(Curly('{')); 
-                         let value = self.expr();
-                         self.consume_type(Curly('}'));
-                         Box::new(FnExpr::new(fn_name, None, value))
+                         let fn_block = self.block();
+                         Box::new(FnExpr::new(fn_name, None,fn_block))
                       }
                   } else {
                       self.term()
@@ -103,25 +99,34 @@ impl Parser {
     fn consume(&mut self) -> Token {
         self.tokens.next().unwrap()
     }
-    fn consume_type(&mut self, typ : TokenType) -> Result<Token, ()> {
-        match self.peek() {
+    fn consume_type(&mut self, typ : TokenType) -> Option<Token> {
+        let result = match self.peek() {
             Some(token) if &token.token_type == &typ =>  {
                 Ok(self.consume())
             }
             Some(_) => {
                 self.had_errors = true;
-                return Err(println!("{}",ParseErr::Expected(Box::new(typ), self.consume())));
+                Err(ParseErr::Expected(Box::new(typ), self.consume()))
             },
-            None => Err(println!("{}", ParseErr::EOF))
+            None => Err(ParseErr::EOF)
+        };
+        match result {
+            Ok(t) => Some(t),
+            Err(e) => {
+                println!("{}", &e);
+                None
+            }
         }
     }
-    fn block(&mut self) {
-
+    fn block(&mut self) -> Box<dyn Expr> {
+        self.consume_type(Curly('{')); 
+        let value = self.expr();
+        self.consume_type(Curly('{')); 
+        value
     }
 
-    fn enclosed_resolve(&mut self) {
-        
-    }
+
+
 
     fn synchronize(&mut self) {
         while let Some(token) = self.peek() {
