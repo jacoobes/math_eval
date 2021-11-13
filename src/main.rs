@@ -19,6 +19,7 @@ fn main() {
         if Parser::check_lexer_errors(&token_generator.tokens) {
            continue; 
         }
-        println!("{:?}", token_generator.tokens);
+        let mut parser = Parser::new(token_generator.tokens);
+        println!("{:?}", parser.parse())
     }
 }
