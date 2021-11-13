@@ -3,7 +3,7 @@ use std::fmt::Display;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParseErr {
-    Expected(Token, Token),
+    Expected( Box<TokenType>, Token),
     EOF,
     Lex(Token)
 }
@@ -11,8 +11,8 @@ pub enum ParseErr {
 impl Display for ParseErr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ParseErr::Expected(got, wanted) => {
-                write!(f, "Expected : {:?} \n\nGot: {:?}\nUnexpected characters ", *wanted, *got)
+            ParseErr::Expected(expected, got) => {
+                write!(f, "Expected : {:?} \n\nGot: {:?}\n ", *expected, got.token_type)
             }
             ParseErr::EOF => {
                 write!(f, "Unexpected end of input!")

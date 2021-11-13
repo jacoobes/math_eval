@@ -67,7 +67,7 @@ impl Tokenizer {
                 '(' | ')' => self.add_token(Token::new(Paren(cha))),
                 '+' | '-' => self.add_token(Token::new(Term(cha))),
                 '/' | 'x' | '%' => self.add_token(Token::new(Factor(cha))),
-                '_' => self.add_token(Token::new(Base(cha))),
+                '_' => self.add_token(Token::new(Base)),
                 '^' => self.add_token(Token::new(Power(cha))),
                 '~' => self.add_token(Token::new(Squiggly(cha))),
                 '0'..='9' | '.' => {

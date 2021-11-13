@@ -13,7 +13,7 @@ use crate::panicker::parse_error::ParseErr;
 use std::{f64::consts::PI, vec::IntoIter};
 pub struct Parser {
     tokens: PeekMoreIterator<IntoIter<Token>>,
-    errors: Vec<ParseErr>
+    had_errors: bool
 }
 
 impl Parser {
@@ -21,7 +21,7 @@ impl Parser {
         
         Self {
             tokens: tokens.into_iter().peekmore(),
-            errors: vec![]
+            had_errors: false
         }
     }
 
@@ -38,12 +38,91 @@ impl Parser {
         };
         had_err
     }
+
+    pub fn parse(&mut self) -> Vec<Box<dyn Expr>> {
+        let mut parse_tree = vec![];
+        while let Some(_) = self.peek() {
+            if self.had_errors {
+                self.synchronize();
+            } 
+            parse_tree.push(self.expr());
+        }
+        parse_tree 
+    }
+
+    fn expr(&mut self) -> Box<dyn Expr> {
+        self.fn_expr()
+    }
+    fn fn_expr(&mut self) -> Box<dyn Expr> {
+        if let Some(token) = self.peek() {
+            match &token.token_type {
+                Sine | Cosecant | Cotangent | Secant | Cosine | Tangent 
+                | Ln | Log | ArcCosine | ArcCot | ArcCsc | ArcSine | ArcTangent | Degree 
+                | Rad | Root | ArcSec => {
+                  let fn_name = self.consume();
+                  if let Some(token) = self.peek() {
+                      if &token.token_type == &Base { 
+                        self.consume();  
+                        let base = Some(self.expr());
+                        self.consume_type(Curly('{'));
+                        let value = self.expr();
+                        self.consume_type(Curly('}'));
+                        Box::new(FnExpr::new(fn_name, base, value))
+                      } else {
+                         self.consume();
+                         self.consume_type(Curly('{')); 
+                         let value = self.expr();
+                         self.consume_type(Curly('}'));
+                         Box::new(FnExpr::new(fn_name, None, value))
+                      }
+                  } else {
+                      self.term()
+                  }
+                }
+                _ => self.term()
+            }
+        } else {
+            self.term()
+        }
+    }
+    fn term(&mut self) -> Box<dyn Expr> {
+        self.factor()   
+    }
+    fn factor(&mut self) -> Box<dyn Expr> {
+        self.power()
+    }
+    fn power(&mut self) -> Box<dyn Expr> {
+        self.primary()
+    }
+    fn primary(&mut self) -> Box<dyn Expr> {
+        Box::new(Number::new(None))
+    }
     fn peek(&mut self) -> Option<&Token> {
         self.tokens.peek()
     }
     fn consume(&mut self) -> Token {
         self.tokens.next().unwrap()
     }
+    fn consume_type(&mut self, typ : TokenType) -> Result<Token, ()> {
+        match self.peek() {
+            Some(token) if &token.token_type == &typ =>  {
+                Ok(self.consume())
+            }
+            Some(_) => {
+                self.had_errors = true;
+                return Err(println!("{}",ParseErr::Expected(Box::new(typ), self.consume())));
+            },
+            None => Err(println!("{}", ParseErr::EOF))
+        }
+    }
+    fn block(&mut self) {
+
+    }
+
+    fn enclosed_resolve(&mut self) {
+        
+    }
+
     fn synchronize(&mut self) {
         while let Some(token) = self.peek() {
             match &token.token_type {

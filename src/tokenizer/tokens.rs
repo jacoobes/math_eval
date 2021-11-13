@@ -70,7 +70,7 @@ pub enum TokenType {
     ArcCosine,
     ArcTangent,
     Log,
-    Base(char),
+    Base,
     Ans(Option<f64>),
     Ln,
     E(f64),
