@@ -20,6 +20,10 @@ fn main() {
            continue; 
         }
         let mut parser = Parser::new(token_generator.tokens);
-        println!("{:?}", parser.parse())
+        let values = parser.parse();
+        if parser.had_err() {
+            continue;
+        }
+        println!("{:?}", values)
     }
 }

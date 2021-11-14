@@ -1,15 +1,15 @@
 use crate::{parser::expr::expr::Expr, tokenizer::tokens::Token};
 #[derive(Debug)]
-struct BinaryExpr<L: Expr, R: Expr> {
-    left: L,
+pub struct BinaryExpr {
+    left: Box<dyn Expr>,
     operator: Token,
-    right: R,
+    right: Box<dyn Expr>,
 }
 
-impl<L: Expr, R: Expr> Expr for BinaryExpr<L, R> {}
+impl Expr for BinaryExpr {}
 
-impl<L: Expr, R: Expr> BinaryExpr<L, R> {
-    pub fn new(left: L, operator: Token, right: R) -> Self {
+impl BinaryExpr {
+    pub fn new(left: Box<dyn Expr>, operator: Token, right: Box<dyn Expr>) -> Self {
         Self {
             left,
             operator,
