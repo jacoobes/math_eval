@@ -64,34 +64,44 @@ impl Parser {
     }
 
     fn fn_expr(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
-        // let peek = self.peek().and_then(|_| Ok(self.consume()));
-
-        // match peek {
-        //     Ok(tok) =>
-        //         match tok.token_type {
-        //         Sine | Cosecant | Cotangent | Secant | Cosine | Tangent | Ln | Log | ArcCosine
-        //         | ArcCot | ArcCsc | ArcSine | ArcTangent | Degree | Rad | Root | ArcSec => {
-        //             let name = tok;
-        //             let base = match self.consume_type(Base) {
-        //                 Ok(token) => {
-
-        //                 },
-        //                 Err(e) => ()
-        //             }
-        //         }
-        //         _=> self.term()
-        //     },
-        //     Err(e) => Err(e)
-        // }
+        if let Ok(token) =  self.match_advance(
+            vec![ Sine, Cosecant, ArcCsc, Cosine, Secant,  ArcSec,  Tangent, Cotangent, ArcCot, ArcSine,
+            ArcCosine, ArcTangent, Ln, Rad,
+            Degree,]
+        ) {
+                let block = self.fn_block()?;
+                return Ok(Box::new(FnExpr::new(token, None, block)))
+        }
+         if let Ok(token) = self.match_advance(vec![Log,Root ]) {
+                self.consume_if(&Base, "Expected Base")?;
+                let base = self.expr()?;
+                let block = self.fn_block()?;
+                return Ok(Box::new(FnExpr::new(token, Some(base),block )))
+        };
         self.term()
     }
+    //left associative
     fn term(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
-        self.factor()
-    }
-    fn factor(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
-        let mut expr = self.power();
+        let mut expr = self.factor();
+
+        while let Ok(tok) = self.match_advance(vec![Term('+'), Term('-')]) {
+            let right = self.power();
+            expr = Ok(Box::new(BinaryExpr::new(expr?, tok.token_type, right?)))
+        }
         expr
     }
+    //left associative
+    fn factor(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
+        let mut expr = self.power();
+
+        while let Ok(tok) = self.match_advance(vec![Factor('x'), Factor('/'), Factor('%') ]) {
+            let right = self.power();
+            expr = Ok(Box::new(BinaryExpr::new(expr?, tok.token_type, right?)))
+        }
+
+        expr
+    }
+    //right associative
     fn power(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
         let mut expr = self.unary();
 
@@ -105,6 +115,7 @@ impl Parser {
 
         expr
     }
+    //right associative
     fn unary(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
         match self.match_advance(vec![Term('+'), Term('-'), Squiggly]) {
             Ok(token ) => {
@@ -143,7 +154,13 @@ impl Parser {
             _ => Err(ParseErr::UnknownKeyword(self.next()?.token_type, "Encountered an out-of-place token while parsing.")),
         }
     }
-
+    fn fn_block(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
+        
+        self.consume_if(&Curly('{'), "Expected a '{' after fn_expr declaration!")?;
+        let expr = self.expr()?;
+        self.consume_if(&Curly('}'), "Expected '}' after fn_expr declaration!")?;
+        Ok(expr)
+    }
 
     fn peek(&mut self) -> Result<&Token, ()> {
         if let None = self.tokens.peek() {
@@ -158,9 +175,6 @@ impl Parser {
         } else {
             Ok(self.tokens.next().unwrap())
         }
-    }
-    fn previous(&self) -> &Token {
-        todo!()
     }
 
     fn consume_if(
@@ -187,16 +201,4 @@ impl Parser {
         println!("{}", err);
         err
     }
-    // fn sync (&mut self)  {
-    //     while let Some(tok) = self.peek() {
-    //         match tok.token_type {
-    //             Sine | Cosecant | Cotangent | Secant | Cosine | Tangent | Ln | Log | ArcCosine
-    //             | ArcCot | ArcCsc | ArcSine | ArcTangent | Degree | Rad | Root | ArcSec  | Literal(_) => {
-    //                 break;
-    //             }
-    //             _ => { self.next(); }
-
-    //         }
-    //     };
-    // }
 }
