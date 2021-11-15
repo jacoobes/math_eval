@@ -37,7 +37,7 @@ impl Tokenizer {
                         .unwrap(),
                 );
             } else {
-                break
+                break;
             }
         }
         parseable
@@ -63,13 +63,13 @@ impl Tokenizer {
         while let Some(cha) = self.consume() {
             match cha {
                 ' ' => (),
-                '{' | '}' => self.add_token(Token::new(Curly(cha), None) ),
+                '{' | '}' => self.add_token(Token::new(Curly(cha), None)),
                 '(' | ')' => self.add_token(Token::new(Paren(cha), None)),
                 '+' | '-' => self.add_token(Token::new(Term(cha), None)),
                 '/' | 'x' | '%' => self.add_token(Token::new(Factor(cha), None)),
                 '_' => self.add_token(Token::new(Base, None)),
                 '^' => self.add_token(Token::new(Power, None)),
-                '~' => self.add_token(Token::new(Squiggly(cha), None)),
+                '~' => self.add_token(Token::new(Squiggly, None)),
                 '0'..='9' | '.' => {
                     let parseable = self.consume_num(cha);
                     //if token is not parseable, push a poisoned token (erroring in parsing stage), else push a number
@@ -85,9 +85,14 @@ impl Tokenizer {
                     self.add_token(Token::new(token_type, None))
                 }
                 //anything not picked up by lexer will be poisoned
-                _ => self.add_token(Token::new(Poisoned(LexErr::UnknownKeyword(cha.to_string())), None)),
+                _ => self.add_token(Token::new(
+                    Poisoned(LexErr::UnknownKeyword(cha.to_string())),
+                    None,
+                )),
             }
-            if let None = self.peek() {break}; 
+            if let None = self.peek() {
+                break;
+            };
         }
     }
 }

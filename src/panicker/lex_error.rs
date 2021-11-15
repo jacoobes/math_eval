@@ -6,9 +6,6 @@ pub enum LexErr {
     NumParseErr(ParseFloatError, String),
     UnknownKeyword(String),
 }
-
-
-
 impl Display for LexErr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

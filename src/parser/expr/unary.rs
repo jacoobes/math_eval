@@ -3,7 +3,7 @@ use crate::tokenizer::tokens::Token;
 use super::expr::Expr;
 
 #[derive(Debug)]
-struct Unary {
+pub struct Unary {
     sign: Token,
     value: Box<dyn Expr>,
 }
@@ -11,7 +11,7 @@ struct Unary {
 impl Expr for Unary {}
 
 impl Unary {
-    pub fn new(sign : Token, value: Box<dyn Expr>) -> Self {
+    pub fn new(sign: Token, value: Box<dyn Expr>) -> Self {
         Self { sign, value }
     }
 }

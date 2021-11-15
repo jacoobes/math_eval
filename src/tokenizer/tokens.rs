@@ -5,11 +5,11 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
-    pub value : Option<f64>
+    pub value: Option<f64>,
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, value : Option<f64>) -> Self {
+    pub fn new(token_type: TokenType, value: Option<f64>) -> Self {
         Self { token_type, value }
     }
 
@@ -52,7 +52,6 @@ impl Token {
 pub enum TokenType {
     Term(char),
     Factor(char),
-    Function(String),
     Literal,
     Paren(char),
     Pi,
@@ -77,8 +76,7 @@ pub enum TokenType {
     Root,
     Curly(char),
     Poisoned(LexErr),
-    Squiggly(char),
+    Squiggly,
     Rad,
     Degree,
-    
 }

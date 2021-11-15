@@ -2,10 +2,10 @@ use crate::tokenizer::tokens::{Token, TokenType};
 use std::fmt::Display;
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum ParseErr{
-    Expected( (TokenType, TokenType)),
+pub enum ParseErr {
+    Expected((TokenType, TokenType)),
     EOF(&'static str),
-    UnknownKeyword(TokenType)
+    UnknownKeyword(TokenType, &'static str),
 }
 
 impl Display for ParseErr {
@@ -17,11 +17,11 @@ impl Display for ParseErr {
             ParseErr::EOF(extra_msg) => {
                 write!(f, "Unexpected end of input! {}", extra_msg)
             }
-            ParseErr::UnknownKeyword(tok) => {
-                write!(f, "Unexpected token_type {:?}", &tok)
-                }
+            ParseErr::UnknownKeyword(tok, extra_msg) => {
+                write!(f, "Unexpected token_type {:?}. {}", &tok, extra_msg)
+            }
         }
     }
 }
 
-impl std::error::Error for ParseErr{}
+impl std::error::Error for ParseErr {}

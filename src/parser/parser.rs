@@ -5,6 +5,7 @@ use crate::panicker::lex_error::LexErr;
 use crate::panicker::parse_error::ParseErr;
 use crate::parser::expr::binary::BinaryExpr;
 use crate::parser::expr::function_expr::FnExpr;
+use crate::parser::expr::unary::Unary;
 use crate::parser::expr::grouping::Grouping;
 use crate::parser::expr::number::Number;
 use crate::tokenizer::tokens::{
@@ -12,7 +13,7 @@ use crate::tokenizer::tokens::{
     TokenType::{self, *},
 };
 use std::iter::Peekable;
-use std::vec::IntoIter;
+use std::vec::{self, IntoIter};
 pub struct Parser {
     tokens: Peekable<IntoIter<Token>>,
     had_errors: bool,
@@ -89,26 +90,33 @@ impl Parser {
     }
     fn factor(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
         let mut expr = self.power();
-
-        
-        
-
         expr
     }
     fn power(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
-        let mut expr = self.primary();
-        
-        match self.peek() {
-            Ok(tok) if tok.token_type == Power => {
-               self.next()?;
-               let right = self.power();
-               expr = Ok(Box::new(BinaryExpr::new(expr?, Power, right?))) 
-            },
-            Ok(_) | Err(_) => ()
+        let mut expr = self.unary();
+
+        match self.match_advance(vec![Power]){
+            Ok(tok) => {
+                let right = self.power();
+                expr = Ok(Box::new(BinaryExpr::new(expr?, tok.token_type, right?)))
+            }
+             Err(_) => (),
         };
-        
-        expr  
+
+        expr
     }
+    fn unary(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
+        match self.match_advance(vec![Term('+'), Term('-'), Squiggly]) {
+            Ok(token ) => {
+                let expr = self.unary();
+                return Ok(Box::new(Unary::new(token, expr?)))
+            },
+            Err(_) => ()
+        }
+        self.primary()
+
+    }
+
     fn primary(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
         match &self.peek().map_err(|_| ParseErr::EOF("END"))?.token_type {
             Paren('(') => {
@@ -132,9 +140,10 @@ impl Parser {
             Literal => Ok(Box::new(Number::new(
                 self.next().and_then(|c| Ok(c.value))?,
             ))),
-            _ => Err(ParseErr::UnknownKeyword(self.next()?.token_type)),
+            _ => Err(ParseErr::UnknownKeyword(self.next()?.token_type, "Encountered an out-of-place token while parsing.")),
         }
     }
+
 
     fn peek(&mut self) -> Result<&Token, ()> {
         if let None = self.tokens.peek() {
@@ -154,11 +163,22 @@ impl Parser {
         todo!()
     }
 
-    fn consume_if( &mut self, typ: &TokenType,  message_if_fail: &'static str,)
-     -> Result<Token, ParseErr> {
+    fn consume_if(
+        &mut self,
+        typ: &TokenType,
+        message_if_fail: &'static str,
+    ) -> Result<Token, ParseErr> {
         match self.peek().map_err(|_| ParseErr::EOF(message_if_fail))? {
             tok if &tok.token_type == typ => Ok(self.next())?,
             tok => Err(ParseErr::Expected((typ.clone(), tok.token_type.clone()))),
+        }
+    }
+    fn match_advance(&mut self, types: Vec<TokenType>) -> Result<Token, ()> {
+        match &self.peek()?.token_type {
+            toke if types.iter().any(|tt| tt == toke )=> {
+                Ok(self.next().map_err(|_|()))?
+            }
+            _ => Err(())
         }
     }
 
