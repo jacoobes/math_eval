@@ -5,11 +5,12 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
+    pub value : Option<f64>
 }
 
 impl Token {
-    pub fn new(token_type: TokenType) -> Self {
-        Self { token_type }
+    pub fn new(token_type: TokenType, value : Option<f64>) -> Self {
+        Self { token_type, value }
     }
 
     pub fn reserved_keywords() -> HashMap<&'static str, TokenType> {
@@ -27,10 +28,10 @@ impl Token {
             "arcsin" => TokenType::ArcSine,
             "arccos" => TokenType::ArcCosine,
             "arctan" => TokenType::ArcTangent,
-            "PI" => TokenType::Pi(std::f64::consts::PI),
-            "ans" => TokenType::Ans(None),
+            "pi" => TokenType::Pi,
+            "ans" => TokenType::Ans,
             "ln" => TokenType::Ln,
-            "e" => TokenType::E(std::f64::consts::E),
+            "e" => TokenType::E,
             "root" => TokenType::Root,
             "rad" => TokenType::Rad,
             "degree" => TokenType::Degree
@@ -52,9 +53,9 @@ pub enum TokenType {
     Term(char),
     Factor(char),
     Function(String),
-    Literal(f64),
+    Literal,
     Paren(char),
-    Pi(f64),
+    Pi,
     Sine,
     Cosecant,
     ArcCsc,
@@ -64,15 +65,15 @@ pub enum TokenType {
     Tangent,
     Cotangent,
     ArcCot,
-    Power(char),
+    Power,
     ArcSine,
     ArcCosine,
     ArcTangent,
     Log,
     Base,
-    Ans(Option<f64>),
+    Ans,
     Ln,
-    E(f64),
+    E,
     Root,
     Curly(char),
     Poisoned(LexErr),

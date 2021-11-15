@@ -45,28 +45,24 @@ impl Parser {
         self.had_errors
     }
 
-    pub fn parse(&mut self) -> Result<Vec<Box<dyn Expr>>, ()> {
+    pub fn parse(&mut self) -> Result<Vec<Box<dyn Expr>>, ParseErr> {
         let mut parse_tree = vec![];
-        while let Some(_) = self.peek() {
-            if !self.had_errors {
-                parse_tree.push(self.expr()?);
-            } else {
-                parse_tree.clear();
-                self.had_errors = false;
-                break;
-            }
+        
+        while let Ok(_) = self.peek() {
+            parse_tree.push(self.expr()?)
         }
+
         Ok(parse_tree)
     }
-    fn expr(&mut self) ->  Result<Box<dyn Expr>,()> {
+    fn expr(&mut self) ->  Result<Box<dyn Expr>,ParseErr> {
         if self.had_errors {
-            Err(())
+            Err(ParseErr::EOF("Ended evaluation"))
         } else {
             self.fn_expr()
         }
     }
     
-    fn fn_expr(&mut self) -> Result<Box<dyn Expr>,()> {
+    fn fn_expr(&mut self) -> Result<Box<dyn Expr>,ParseErr> {
         // let peek = self.peek().and_then(|_| Ok(self.consume()));
 
         // match peek {
@@ -88,89 +84,90 @@ impl Parser {
         // }
         self.term()
     }
-    fn term(&mut self) -> Result<Box<dyn Expr>,()> {
+    fn term(&mut self) ->Result<Box<dyn Expr>,ParseErr> {
         self.factor()
     }
-    fn factor(&mut self) -> Result<Box<dyn Expr>,()> {
+    fn factor(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
         self.power()
     }
-    fn power(&mut self) ->  Result<Box<dyn Expr>,()> {
-        if let None = self.peek() {
-            self.sync();
-        }
+    fn power(&mut self) ->  Result<Box<dyn Expr>, ParseErr> {
         self.primary()
     }
-    fn primary(&mut self) -> Result<Box<dyn Expr>,()> {
-        if let None = self.peek() {
-            self.sync();
-        }
-        
-       let token = self.consume().unwrap(); 
-            match token.token_type {
-                Paren('(') => {
-                    let expr = self.expr();
-                    self.consume_type(Paren(')'))?;
-                    Ok(Box::new(Grouping::new( expr.unwrap() )))
-                },                
-                Pi(val) => Ok(Box::new(Number::new(Some(val)))),
-                E(val) => Ok(Box::new(Number::new(Some(val)))),
-                Ans(val) => Ok(Box::new(Number::new(val))),
-                Literal(val) => Ok(Box::new(Number::new(Some(val)))),
-                _ => {
-                    self.report(ParseErr::UnknownKeyword(token));
-                    Err(())
-                }
-            }
-        } 
+    fn primary(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
+        match &self.peek()?.token_type {
+            Paren('(') => {
+                self.next()?;
+                let expr = self.expr();
+                self.consume_if(&Paren(')'), "Expected RIGHT_PAREN, parsed until end of line")?;
+                Ok(Box::new(Grouping::new( expr.unwrap() )))
+            },                
+            Pi => Ok( 
+                Box::new(
+                    Number::new(Some(self.next().map(|_| std::f64::consts::PI )?))
+                )
 
-    fn peek(&mut self) -> Option<&Token> {
-        self.tokens.peek()
+            ),
+            E => Ok(
+                Box::new(
+                    Number::new(Some(self.next().map(|_| std::f64::consts::E )?))
+                )
+            ),
+            Ans => Ok(
+                Box::new(
+                    Number::new(self.next().and_then(|tok| Ok(tok.value))?)
+                )
+            ),
+            Literal => Ok(
+                Box::new(
+                    Number::new(self.next().and_then(|c| Ok(c.value) )?)
+                )
+            ),
+            _ => Err(
+                ParseErr::UnknownKeyword(self.next()?.token_type)
+            ),
+
+        }
+
+    } 
+ 
+
+    fn peek(&mut self) -> Result<&Token, ParseErr>  {
+        if let None = self.tokens.peek() { Err(ParseErr::EOF("")) } 
+        else { Ok( self.tokens.peek().unwrap() ) }
     }
-    fn consume(&mut self) -> Option<Token> {
-        match self.tokens.next() {
-            Some(c) => Some(c),
-            None => {
-                self.report(ParseErr::EOF);
-                None
-            }
+    fn next(&mut self) -> Result<Token, ParseErr> {
+        if let None = self.tokens.peek() {Err(ParseErr::EOF("Tried consuming, nothing left to consume!"))} 
+        else {  Ok(self.tokens.next().unwrap()) }
+         
+    }
+    fn previous(&self) -> &Token {
+       todo!()
+    }
+    
+    fn consume_if(&mut self, typ: &TokenType, message_if_fail: &'static str) -> Result<Token, ParseErr> {
+        match self.peek().map_err(|_| ParseErr::EOF(message_if_fail))? {
+           tok if &tok.token_type == typ => Ok(self.next())?,
+           tok => Err(ParseErr::Expected((typ.clone(), tok.token_type.clone()))),    
         }
     }
-    fn consume_type(&mut self, typ: TokenType,) -> Result<Token, ()>  {
-      if let None = self.peek() {
-         return Err(self.report(ParseErr::EOF));
-      } 
-        let tok = self.peek().unwrap().to_owned(); 
-          if typ != tok.token_type {
-               Err( self.report(ParseErr::Expected((typ, tok.token_type))))
-            } else {
-                Ok(self.consume().unwrap())
-            }
-        
-    }
 
-    fn report(&mut self, err : ParseErr)  {
+    fn report(&mut self, err : ParseErr) -> ParseErr  {
         self.had_errors = true;
         println!("{}", err);
-        self.sync();
+        err
     }
-    fn block(&mut self) -> Result<Box<dyn Expr>, ()> {
-        self.consume_type(Curly('{'))?;
-        let value = self.fn_expr();
-        self.consume_type(Curly('}'))?;
-        value
-    }
-    fn sync (&mut self)  {
-        while let Some(tok) = self.peek() {
-            match tok.token_type {
-                Sine | Cosecant | Cotangent | Secant | Cosine | Tangent | Ln | Log | ArcCosine
-                | ArcCot | ArcCsc | ArcSine | ArcTangent | Degree | Rad | Root | ArcSec  | Literal(_) => {
-                    break;
-                }
-                _ => { self.consume(); }
+    // fn sync (&mut self)  {
+    //     while let Some(tok) = self.peek() {
+    //         match tok.token_type {
+    //             Sine | Cosecant | Cotangent | Secant | Cosine | Tangent | Ln | Log | ArcCosine
+    //             | ArcCot | ArcCsc | ArcSine | ArcTangent | Degree | Rad | Root | ArcSec  | Literal(_) => {
+    //                 break;
+    //             }
+    //             _ => { self.next(); }
 
-            }
-        };
-    }
+    //         }
+    //     };
+    // }
 
 
 }
