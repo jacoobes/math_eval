@@ -16,20 +16,17 @@ use std::iter::Peekable;
 use std::vec::{self, IntoIter};
 pub struct Parser {
     tokens: Peekable<IntoIter<Token>>,
-    had_errors: bool,
 }
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
         Self {
             tokens: tokens.into_iter().peekable(),
-            had_errors: false,
         }
     }
 
     pub fn check_lexer_errors(tokens: &Vec<Token>) -> bool {
         let mut had_err = false;
-        println!("{:?}", tokens);
         for token in tokens {
             match &token.token_type {
                 Poisoned(e) => {
@@ -42,9 +39,6 @@ impl Parser {
         had_err
     }
 
-    pub fn had_err(&self) -> bool {
-        self.had_errors
-    }
 
     pub fn parse(&mut self) -> Result<Vec<Box<dyn Expr>>, ParseErr> {
         let mut parse_tree = vec![];
@@ -56,11 +50,7 @@ impl Parser {
         Ok(parse_tree)
     }
     fn expr(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
-        if self.had_errors {
-            Err(ParseErr::EOF("Ended evaluation"))
-        } else {
-            self.fn_expr()
-        }
+        self.fn_expr()
     }
 
     fn fn_expr(&mut self) -> Result<Box<dyn Expr>, ParseErr> {
@@ -137,7 +127,7 @@ impl Parser {
                     &Paren(')'),
                     "Expected RIGHT_PAREN, parsed until end of line",
                 )?;
-                Ok(Box::new(Grouping::new(expr.unwrap())))
+                Ok(Box::new(Grouping::new(expr?)))
             }
             Pi => Ok(Box::new(Number::new(Some(
                 self.next().map(|_| std::f64::consts::PI)?,
@@ -196,9 +186,4 @@ impl Parser {
         }
     }
 
-    fn report(&mut self, err: ParseErr) -> ParseErr {
-        self.had_errors = true;
-        println!("{}", err);
-        err
-    }
 }

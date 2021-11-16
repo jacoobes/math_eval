@@ -2,7 +2,6 @@ use crate::tokenizer::tokens::Token;
 
 use super::expr::Expr;
 
-#[derive(Debug)]
 pub struct FnExpr {
     function: Token,
     base: Option<Box<dyn Expr>>,
@@ -17,5 +16,18 @@ impl FnExpr {
             base,
             value,
         }
+    }
+    fn base_or_no(&self) -> String {
+        if let Some(_) = self.base {
+            format!("_({:?})", &self.base)
+        } else {
+            "".to_string()
+        }
+    }
+}
+
+impl std::fmt::Debug for FnExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}" , format!("\n {:?} {} {} {:?} {}\n", &self.function.token_type , self.base_or_no(), "{", *&self.value, "}"))
     }
 }
